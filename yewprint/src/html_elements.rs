@@ -1,9 +1,8 @@
 use yew::prelude::*;
-use yewtil::{Pure, PureComponent};
 
 macro_rules! build_component {
     ($name:ident, $props_name:ident, $tag:tt, $class:literal) => {
-        pub type $name = Pure<$props_name>;
+        pub struct $name;
 
         #[derive(Debug, Clone, PartialEq, yew::prelude::Properties)]
         pub struct $props_name {
@@ -14,16 +13,19 @@ macro_rules! build_component {
         }
 
         impl Component for $props_name {
-            type Message = Self;
-            type Properties = Self;
+            type Message = ();
+            type Properties = $props_name;
 
-            fn create(_ctx: &Context<Self>) -> Self {
-                Self
+            fn create(ctx: &Context<Self>) -> Self {
+                Self {
+                    class: Classes::new(),
+                    children: ctx.props().children.clone(),
+                }
             }
 
             fn view(&self, _ctx: &yew::Context<Self>) -> Html {
                 html! {
-                    <$tag class={classes!($class, self.class.clone())}>
+                    <$tag class={classes!($class, ctx.props().class.clone())}>
                         {self.children.clone()}
                     </$tag>
                 }
