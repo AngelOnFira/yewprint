@@ -3,7 +3,7 @@ use yewprint::{IconName, Intent, Tag};
 
 pub struct Example {
     props: ExampleProps,
-    link: &html::Scope<Self>,
+    link: html::Scope<Self>,
     tags: Vec<String>,
 }
 
@@ -35,7 +35,11 @@ impl Component for Example {
 
     fn create(ctx: &Context<Self>) -> Self {
         let tags = ctx.props().initial_tags.clone();
-        Example { props, link, tags }
+        Example {
+            props: ctx.props().clone(),
+            link: ctx.link().clone(),
+            tags,
+        }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -54,18 +58,20 @@ impl Component for Example {
     }
 
     fn changed(&mut self, ctx: &Context<Self>) -> bool {
-        if self.props != props {
+        if self.props != *ctx.props() {
             if self.props.reset_tags != ctx.props().reset_tags {
                 self.tags = ctx.props().initial_tags.clone();
             }
-            self.props = props;
+            self.props = ctx.props().clone();
             true
         } else {
             false
         }
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let props = ctx.props().clone();
+
         self.tags
             .iter()
             .map(|label| {
@@ -78,16 +84,16 @@ impl Component for Example {
                 };
                 html! {
                     <Tag
-                        active={self.props.active}
-                        fill={self.props.fill}
-                        icon={self.props.icon.then(|| IconName::Print)}
-                        intent={self.props.intent}
-                        interactive={self.props.interactive}
-                        large={self.props.large}
-                        minimal={self.props.minimal}
-                        multiline={self.props.multiline}
-                        right_icon={self.props.right_icon.then(|| IconName::Star)}
-                        round={self.props.round}
+                        active={props.active}
+                        fill={props.fill}
+                        icon={props.icon.then(|| IconName::Print)}
+                        intent={props.intent}
+                        interactive={props.interactive}
+                        large={props.large}
+                        minimal={props.minimal}
+                        multiline={props.multiline}
+                        right_icon={props.right_icon.then(|| IconName::Star)}
+                        round={props.round}
                         onremove={remove}
                         onclick={self.link.callback(|_| ExampleMsg::Click)}
                     >

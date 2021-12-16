@@ -1,4 +1,3 @@
-use std::borrow::Cow;
 use yew::prelude::*;
 use yewprint::{Button, ButtonGroup, IconName};
 
@@ -20,12 +19,21 @@ impl Component for Example {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
@@ -35,11 +43,11 @@ impl Component for Example {
                 fill={self.props.fill}
                 large={self.props.large}
                 vertical={self.props.vertical}
-                style={Cow::Borrowed("margin:0;")}
+                style="margin:0;"
             >
-                <Button icon={IconName::Database>{"Queries"}</Button>}
-                <Button icon={IconName::Function>{"Functions"}</Button>}
-                <Button icon={IconName::Cog>{"Options"}</Button>}
+                <Button icon={IconName::Database}>{"Queries"}</Button>
+                <Button icon={IconName::Function}>{"Functions"}</Button>
+                <Button icon={IconName::Cog}>{"Options"}</Button>
             </ButtonGroup>
         }
     }

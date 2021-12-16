@@ -2,7 +2,7 @@ use yew::prelude::*;
 use yewprint::{Button, Intent, PanelStack, PanelStackState, Text};
 
 pub struct Example {
-    link: &html::Scope<Self>,
+    link: html::Scope<Self>,
     props: ExampleProps,
     state: PanelStackState,
 }
@@ -29,7 +29,7 @@ impl Component for Example {
                 <div>{"Hello World!"}</div>
                 <Button
                     intent={Intent::Primary}
-                    onclick={link.callback(|_| ExampleMessage::OpenPanel2)}
+                    onclick={ctx.link().callback(|_| ExampleMessage::OpenPanel2)}
                 >
                     {"Open panel 2"}
                 </Button>
@@ -42,7 +42,11 @@ impl Component for Example {
         })
         .finish();
 
-        Example { link, props, state }
+        Example {
+            link: ctx.link().clone(),
+            props: ctx.props().clone(),
+            state,
+        }
     }
 
     fn update(&mut self, _ctx:  &Context<Self>, msg: Self::Message) -> bool {
@@ -71,10 +75,20 @@ impl Component for Example {
         }
     }
 
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
+    }
+
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
             <div>
                 <PanelStack
+                    // TODO: this makes it impossible to remove the panel after animation. Should be reference, context, singleton?
                     state={self.state.clone()}
                     onclose={self.link.callback(|_| ExampleMessage::ClosePanel)}
                     class={classes!("docs-panel-stack-example")}
@@ -87,7 +101,7 @@ impl Component for Example {
 // Second panel: a simple counter
 
 pub struct Panel2 {
-    link: &html::Scope<Self>,
+    link: html::Scope<Self>,
     counter: i64,
 }
 
@@ -100,7 +114,10 @@ impl Component for Panel2 {
     type Properties = ();
 
     fn create(ctx: &Context<Self>) -> Self {
-        Panel2 { counter: 0, link }
+        Panel2 {
+            counter: 0,
+            link: ctx.link().clone(),
+        }
     }
 
     fn update(&mut self, _ctx:  &Context<Self>, msg: Self::Message) -> bool {

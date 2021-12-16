@@ -1,4 +1,3 @@
-use std::borrow::Cow;
 use yew::prelude::*;
 
 pub struct Text {
@@ -17,9 +16,9 @@ pub struct TextProps {
     #[prop_or_default]
     pub inline: bool,
     #[prop_or_default]
-    pub title: Option<Cow<'static, str>>,
+    pub title: String,
     #[prop_or_default]
-    pub style: Option<Cow<'static, str>>,
+    pub style: String,
 }
 
 impl Component for Text {
@@ -28,12 +27,21 @@ impl Component for Text {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {

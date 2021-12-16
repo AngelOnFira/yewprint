@@ -39,7 +39,7 @@ impl Component for CheckboxDoc {
 
         html! {
             <div>
-            <H1 class=c{lasses!("docs-title")}>{"Checkbox"}</H1>
+            <H1 class={classes!("docs-title")}>{"Checkbox"}</H1>
             <SourceCodeUrl />
             <ExampleContainer
                 source={source}

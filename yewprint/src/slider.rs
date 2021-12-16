@@ -46,20 +46,20 @@ impl<T: Clone + PartialEq + 'static> Component for Slider<T> {
         let mouse_move = {
             let link = ctx.link().clone();
             Closure::wrap(Box::new(move |event: web_sys::MouseEvent| {
-                ctx.link().send_message(Msg::Mouse(event));
+                link.send_message(Msg::Mouse(event));
             }) as Box<dyn FnMut(_)>)
         };
         let mouse_up = {
             let link = ctx.link().clone();
             Closure::wrap(Box::new(move |_event: web_sys::MouseEvent| {
-                ctx.link().send_message(Msg::StopChange);
+                link.send_message(Msg::StopChange);
             }) as Box<dyn FnMut(_)>)
         };
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
             mouse_move,
             mouse_up,
-            link: *ctx.link(),
+            link: ctx.link().clone(),
             handle_ref: NodeRef::default(),
             track_ref: NodeRef::default(),
             is_moving: false,
@@ -177,6 +177,15 @@ impl<T: Clone + PartialEq + 'static> Component for Slider<T> {
         }
     }
 
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
+    }
+
     fn view(&self, _ctx: &Context<Self>) -> Html {
         let value_index = self
             .props
@@ -208,7 +217,7 @@ impl<T: Clone + PartialEq + 'static> Component for Slider<T> {
             html! {
                 <div
                     class={classes!("bp3-slider-label")}
-                    style={"left: 50%;"}
+                    style="left: 50%;"
                 >
                     {label}
                 </div>
@@ -346,7 +355,7 @@ impl<T: Clone + PartialEq + 'static> Component for Slider<T> {
         }
     }
 
-    fn rendered(&mut self, _: bool) {
+    fn rendered(&mut self, _ctx: &Context<Self>, _: bool) {
         if self.focus_handle {
             if let Some(element) = self.handle_ref.cast::<web_sys::HtmlElement>() {
                 let _ = element.focus();

@@ -1,5 +1,4 @@
 use crate::{Icon, IconName, Intent, H6};
-use std::borrow::Cow;
 use yew::prelude::*;
 
 pub struct Menu {
@@ -23,12 +22,21 @@ impl Component for Menu {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
@@ -64,7 +72,7 @@ pub struct MenuItemProps {
     #[prop_or_default]
     pub disabled: bool,
     #[prop_or_default]
-    pub href: Option<Cow<'static, str>>,
+    pub href: String,
     #[prop_or_default]
     pub label: Option<yew::virtual_dom::VNode>,
     #[prop_or_default]
@@ -88,12 +96,21 @@ impl Component for MenuItem {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
@@ -108,7 +125,7 @@ impl Component for MenuItem {
                             .or_else(|| self.props.active.then(|| Intent::Primary)),
                         self.props.class.clone(),
                     )}
-                    href={(!self.props.disabled).then(|| self.props.href.clone()).flatten()}
+                    href={(!self.props.disabled).then(|| self.props.href.clone())}
                     tabIndex={(!self.props.disabled).then(|| "0")}
                     onclick={(!self.props.disabled).then(|| self.props.onclick.clone())}
                 >
@@ -166,7 +183,7 @@ impl Component for MenuDivider {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
         }
     }
 

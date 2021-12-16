@@ -1,4 +1,3 @@
-use std::borrow::Cow;
 use yew::prelude::*;
 
 pub struct ButtonGroup {
@@ -16,7 +15,7 @@ pub struct ButtonGroupProps {
     #[prop_or_default]
     pub large: bool,
     #[prop_or_default]
-    pub style: Option<Cow<'static, str>>,
+    pub style: String,
     #[prop_or_default]
     pub children: html::Children,
     #[prop_or_default]
@@ -29,7 +28,7 @@ impl Component for ButtonGroup {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
         }
     }
 
@@ -37,7 +36,16 @@ impl Component for ButtonGroup {
         true
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
+    }
+
+    fn view(&self, _: &Context<Self>) -> Html {
         html! {
             <div
                 class={classes!(

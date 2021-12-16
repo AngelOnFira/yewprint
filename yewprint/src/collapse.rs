@@ -1,5 +1,4 @@
 use gloo_timers::callback::Timeout;
-use std::time::Duration;
 use web_sys::Element;
 use yew::prelude::*;
 
@@ -11,7 +10,6 @@ pub struct Collapse {
     height_when_open: Option<String>,
     animation_state: AnimationState,
     contents_ref: NodeRef,
-    callback_delayed_state_change: Callback<()>,
     handle_delayed_state_change: Option<gloo_timers::callback::Timeout>,
     props: CollapseProps,
     link: html::Scope<Self>,
@@ -25,8 +23,8 @@ pub struct CollapseProps {
     pub children: html::Children,
     #[prop_or_default]
     pub keep_children_mounted: bool,
-    #[prop_or(Duration::from_millis(200))]
-    pub transition_duration: Duration,
+    #[prop_or(200)]
+    pub transition_duration: u32,
     #[prop_or_default]
     pub class: Classes,
 }
@@ -69,10 +67,9 @@ impl Component for Collapse {
                 AnimationState::Closed
             },
             contents_ref: NodeRef::default(),
-            callback_delayed_state_change: ctx.link().callback(|_| ()),
             handle_delayed_state_change: None,
-            props: *ctx.props(),
-            link: *ctx.link(),
+            props: ctx.props().clone(),
+            link: ctx.link().clone(),
         }
     }
 
@@ -98,7 +95,7 @@ impl Component for Collapse {
                 }
             }
 
-            self.props = ctx.props();
+            self.props = ctx.props().clone();
             true
         } else {
             false
@@ -106,23 +103,28 @@ impl Component for Collapse {
     }
 
     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
+        let link = self.link.clone();
         match self.animation_state {
             AnimationState::OpenStart => {
                 self.animation_state = AnimationState::Opening;
                 self.height = Height::Full;
-                self.handle_delayed_state_change = Some(Box::new(Timeout::new(
+                self.handle_delayed_state_change = Some(Timeout::new(
                     self.props.transition_duration,
-                    self.callback_delayed_state_change.clone(),
-                )));
+                    move || {
+                        drop(link.send_message(()));
+                    },
+                ));
                 true
             }
             AnimationState::ClosingStart => {
                 self.animation_state = AnimationState::Closing;
                 self.height = Height::Zero;
-                self.handle_delayed_state_change = Some(Box::new(Timeout::new(
+                self.handle_delayed_state_change = Some(Timeout::new(
                     self.props.transition_duration,
-                    self.callback_delayed_state_change.clone(),
-                )));
+                    move || {
+                        drop(link.send_message(()));
+                    },
+                ));
                 true
             }
             AnimationState::Opening => {
@@ -141,7 +143,7 @@ impl Component for Collapse {
         }
     }
 
-    fn rendered(&mut self, _first_render: bool) {
+    fn rendered(&mut self, _ctx: &Context<Self>, _first_render: bool) {
         if self.render_children {
             let client_height = self.contents_ref.cast::<Element>().unwrap().client_height();
             self.height_when_open = Some(format!("{}px", client_height));

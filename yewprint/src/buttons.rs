@@ -1,5 +1,4 @@
 use crate::{Icon, IconName, Intent, Spinner, ICON_SIZE_LARGE};
-use std::borrow::Cow;
 use yew::prelude::*;
 
 pub struct Button {
@@ -35,7 +34,7 @@ pub struct ButtonProps {
     #[prop_or_default]
     pub class: Classes,
     #[prop_or_default]
-    pub style: Option<Cow<'static, str>>,
+    pub style: String,
     #[prop_or_default]
     pub children: html::Children,
 }
@@ -46,12 +45,23 @@ impl Component for Button {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        let props = ctx.props().clone();
+
+        if self.props != props {
+            self.props = props;
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {

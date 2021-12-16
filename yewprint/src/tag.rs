@@ -1,5 +1,4 @@
 use crate::{if_html, Icon, IconName, Intent, Text};
-use std::borrow::Cow;
 use yew::prelude::*;
 
 pub struct Tag {
@@ -36,11 +35,11 @@ pub struct TagProps {
     #[prop_or_default]
     pub round: bool,
     #[prop_or_default]
-    pub title: Option<Cow<'static, str>>,
+    pub title: String,
     #[prop_or_default]
     pub class: Classes,
     #[prop_or_default]
-    pub style: Option<Cow<'static, str>>,
+    pub style: String,
 }
 
 impl Component for Tag {
@@ -49,12 +48,21 @@ impl Component for Tag {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {

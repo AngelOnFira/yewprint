@@ -4,6 +4,7 @@ use std::ops::{Add, Bound, RangeBounds, Sub};
 use std::str::FromStr;
 use yew::html::IntoPropValue;
 use yew::prelude::*;
+use web_sys::HtmlInputElement;
 
 pub struct NumericInput<T>
 where
@@ -14,6 +15,7 @@ where
         + FromStr
         + PartialEq
         + PartialOrd
+        + Default
         + 'static,
 {
     props: NumericInputProps<T>,
@@ -21,7 +23,8 @@ where
     input: String,
 }
 
-#[derive(Clone, PartialEq, Properties)]
+
+#[derive(Clone, PartialEq, Properties, Default)]
 pub struct NumericInputProps<T>
 where
     T: Add<Output = T>
@@ -31,6 +34,7 @@ where
         + FromStr
         + PartialEq
         + PartialOrd
+        + Default
         + 'static,
 {
     #[prop_or_default]
@@ -53,9 +57,11 @@ where
     pub intent: Option<Intent>,
     #[prop_or_default]
     pub onchange: Callback<T>,
+    #[prop_or_default]
     pub value: T,
     #[prop_or_default]
     pub bounds: NumericInputRangeBounds<T>,
+    #[prop_or_default]
     pub increment: T,
     #[prop_or_default]
     pub disable_buttons: bool,
@@ -64,7 +70,7 @@ where
 }
 
 pub enum Msg {
-    InputUpdate(String),
+    InputUpdate(InputEvent),
     Up,
     Down,
     Noop,
@@ -79,6 +85,7 @@ where
         + FromStr
         + PartialEq
         + PartialOrd
+        + Default
         + 'static,
 {
     type Message = Msg;
@@ -86,19 +93,30 @@ where
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
-            link: *ctx.link(),
+            props: ctx.props().clone(),
+            link: ctx.link().clone(),
             input: Default::default(),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::InputUpdate(new_value) => {
-                if let Ok(new_value) = new_value.trim().parse::<T>() {
+            Msg::InputUpdate(event) => {
+                let input = event.target_dyn_into::<HtmlInputElement>();
+                let mut new_value = "".to_owned();
+
+                input.map(|input| {
+                    new_value = input.value();
+                });
+                // - is here to be able to delete and write negative numbers
+                if new_value.trim() == "-" {
+                    false
+                } else if new_value.trim() == "" {
+                    self.update_value(Default::default())
+                } else if let Ok(new_value) = new_value.trim().parse::<T>() {
                     self.update_value(new_value)
                 } else {
-                    false
+                    self.update_value(self.props.value)
                 }
             }
             Msg::Up => self.update_value(self.props.value + self.props.increment),
@@ -110,9 +128,13 @@ where
     fn changed(&mut self, ctx: &Context<Self>) -> bool {
         if self.props != *ctx.props() {
             if self.props.value != ctx.props().value {
-                self.input = ctx.props().value.to_string();
+                if ctx.props().value == Default::default() {
+                    self.input = "".to_owned();
+                } else {
+                    self.input = ctx.props().value.to_string();
+                }
             }
-            self.props = *ctx.props();
+            self.props = ctx.props().clone();
             true
         } else {
             false
@@ -160,7 +182,8 @@ where
                 left_element={self.props.left_element.clone()}
                 right_element={self.props.right_element.clone()}
                 value={self.input.clone()}
-                oninput={self.link.callback(|e: InputEvent| Msg::InputUpdate(e.value))}
+                // TODO: normalize if we are to use oninput directly on inputs or process onchange and send string
+                oninput={self.link.callback(|e: InputEvent| Msg::InputUpdate(e))}
                 onkeydown={self.link.callback(|e: KeyboardEvent| {
                     if e.key() == "ArrowUp" {
                         Msg::Up
@@ -208,18 +231,21 @@ where
         + FromStr
         + PartialEq
         + PartialOrd
+        + Default
         + 'static,
 {
-    fn update_value(&mut self, new_value: T) -> bool {
-        let new_value = self.props.bounds.clamp(new_value, self.props.increment);
+    fn update_value(&mut self, mut new_value: T) -> bool {
+        if new_value != Default::default() {
+            new_value = self.props.bounds.clamp(new_value, self.props.increment);
+            self.input = new_value.to_string();
+        } else {
+            self.input = "".to_owned();
+        }
 
         if new_value != self.props.value {
-            self.input = new_value.to_string();
             self.props.onchange.emit(new_value);
-            true
-        } else {
-            false
         }
+        true
     }
 }
 

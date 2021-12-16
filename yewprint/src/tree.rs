@@ -114,7 +114,7 @@ impl<T: Clone + PartialEq + 'static> Component for Tree<T> {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
             previous_expanded_state: Default::default(),
         }
     }
@@ -255,7 +255,7 @@ impl Component for TreeNode {
         TreeNode {
             handler_caret_click: ctx.link().callback(TreeNodeMessage::CaretClick),
             handler_click: ctx.link().callback(TreeNodeMessage::Click),
-            props: *ctx.props(),
+            props: ctx.props().clone(),
         }
     }
 
@@ -288,7 +288,7 @@ impl Component for TreeNode {
 
     fn changed(&mut self, ctx: &Context<Self>) -> bool {
         if self.props != *ctx.props() {
-            self.props = *ctx.props();
+            self.props = ctx.props().clone();
             true
         } else {
             false

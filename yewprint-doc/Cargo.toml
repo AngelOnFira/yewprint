@@ -15,6 +15,7 @@ yew = "0.19"
 web-sys = { version = "0.3", features = ["Window", "MediaQueryList"] }
 yewprint = { path = "../yewprint" }
 yew-router = "0.16"
+gloo-dialogs = "0.1.0"
 
 # `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
 # compared to the default allocator's ~10K. It is slower than the default

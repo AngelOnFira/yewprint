@@ -4,6 +4,7 @@ use crate::ExampleContainer;
 use example::*;
 use yew::prelude::*;
 use yewprint::{Switch, H1, H5};
+use web_sys::HtmlInputElement;
 
 pub struct TextDoc {
     callback: Callback<ExampleProps>,
@@ -74,20 +75,19 @@ crate::build_example_prop_component! {
                     />
                     <input
                         class="bp3-input"
-                        onchange={self.update_props(|props, e|
-                            match e {
-                                ChangeData::Value(text) => {
-                                    ExampleProps {
-                                        text,
-                                        ..props
-                                    }
-                                },
-                                _ => {
-                                    ExampleProps {
-                                        text: "Hello, world!".to_string(),
-                                        ..props
-                                    }
+                        oninput={self.update_props(|props, e: InputEvent| {
+                            let input = e.target_dyn_into::<HtmlInputElement>();
+                            let mut text = props.text;
+                            input.map(|input| {
+                                text = input.value();
+                                if text.trim() == "" {
+                                    text = "Hello, world!".to_string();
                                 }
+                            });
+                            ExampleProps {
+                                text,
+                                ..props
+                            }
                         })}
                         type="text"
                         value={self.props.text.clone()}
