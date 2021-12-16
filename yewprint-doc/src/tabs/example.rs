@@ -2,7 +2,7 @@ use yew::prelude::*;
 use yewprint::{Tab, Tabs};
 
 pub struct Example {
-    link: &html::Scope<Self>,
+    link: html::Scope<Self>,
     props: ExampleProps,
     selected: Civilization,
 }
@@ -19,8 +19,8 @@ impl Component for Example {
 
     fn create(ctx: &Context<Self>) -> Self {
         Example {
-            link,
-            props,
+            link: ctx.link().clone(),
+            props: ctx.props().clone(),
             selected: Civilization::Minoan,
         }
     }
@@ -28,6 +28,15 @@ impl Component for Example {
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         if self.selected != msg {
             self.selected = msg;
+            true
+        } else {
+            false
+        }
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
             true
         } else {
             false

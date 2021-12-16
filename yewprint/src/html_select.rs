@@ -1,5 +1,6 @@
 use crate::{Icon, IconName};
 use yew::prelude::*;
+use web_sys::HtmlSelectElement;
 
 pub struct HtmlSelect<T: Clone + PartialEq + 'static> {
     props: HtmlSelectProps<T>,
@@ -35,23 +36,27 @@ impl<T: Clone + PartialEq + 'static> Component for HtmlSelect<T> {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
-            link: *ctx.link(),
+            props: ctx.props().clone(),
+            link: ctx.link().clone(),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        let i = if let Event::Select(select) = msg {
-            select.selected_index()
-        } else {
-            unreachable!("unexpected ChangeData variant: {:?}", msg);
-        };
-        if i >= 0 {
-            let i = i as usize;
-            let variant = self.props.options[i].0.clone();
-            self.props.onchange.emit(variant);
-        }
+        let input = msg.target_dyn_into::<HtmlSelectElement>();
+        input.map(|input| {
+            let i = input.selected_index() as usize;
+            self.props.onchange.emit(self.props.options[i].0.clone());
+        });
         false
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
@@ -90,7 +95,6 @@ impl<T: Clone + PartialEq + 'static> Component for HtmlSelect<T> {
                     disabled={self.props.disabled}
                     onchange={self.link.callback(|x| x)}
                     title={self.props.title.clone()}
-                    value={"".to_string()}
                 >
                     {option_children}
                 </select>

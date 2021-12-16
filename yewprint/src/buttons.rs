@@ -28,7 +28,7 @@ pub struct ButtonProps {
     #[prop_or_default]
     pub intent: Option<Intent>,
     #[prop_or_default]
-    pub title: String,
+    pub title: Option<String>,
     #[prop_or_default]
     pub onclick: Callback<MouseEvent>,
     #[prop_or_default]
@@ -45,12 +45,23 @@ impl Component for Button {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        let props = ctx.props().clone();
+
+        if self.props != props {
+            self.props = props;
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {

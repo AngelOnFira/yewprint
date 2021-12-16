@@ -3,7 +3,7 @@ use yewprint::{Label, Radio, RadioGroup};
 
 pub struct Example {
     props: ExampleProps,
-    link: &html::Scope<Self>,
+    link: html::Scope<Self>,
     selected_value: Lunch,
 }
 
@@ -24,9 +24,9 @@ impl Component for Example {
 
     fn create(ctx: &Context<Self>) -> Self {
         Example {
-            props,
+            props: ctx.props().clone(),
             selected_value: Lunch::Salad,
-            link,
+            link: ctx.link().clone(),
         }
     }
 
@@ -36,6 +36,15 @@ impl Component for Example {
                 self.selected_value = value;
                 true
             }
+        }
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
         }
     }
 

@@ -69,8 +69,8 @@ impl Component for Collapse {
             },
             contents_ref: NodeRef::default(),
             handle_delayed_state_change: None,
-            props: *ctx.props(),
-            link: *ctx.link(),
+            props: ctx.props().clone(),
+            link: ctx.link().clone(),
         }
     }
 
@@ -96,7 +96,7 @@ impl Component for Collapse {
                 }
             }
 
-            self.props = *ctx.props();
+            self.props = ctx.props().clone();
             true
         } else {
             false
@@ -104,6 +104,8 @@ impl Component for Collapse {
     }
 
     fn update(&mut self, ctx: &Context<Self>, _msg: Self::Message) -> bool {
+        let link = self.link.clone();
+
         match self.animation_state {
             AnimationState::OpenStart => {
                 let link = ctx.link().clone();
@@ -116,7 +118,7 @@ impl Component for Collapse {
                         .try_into()
                         .unwrap(),
                     move || {
-                        link.send_message(());
+                        drop(link.send_message(()));
                     },
                 ));
                 true
@@ -132,7 +134,7 @@ impl Component for Collapse {
                         .try_into()
                         .unwrap(),
                     move || {
-                        link.send_message(());
+                        drop(link.send_message(()));
                     },
                 ));
                 true

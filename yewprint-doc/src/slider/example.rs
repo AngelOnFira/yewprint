@@ -7,7 +7,7 @@ pub struct Example {
     float: f64,
     integer: i32,
     log_level: Option<LogLevel>,
-    link: &html::Scope<Self>,
+    link: html::Scope<Self>,
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -29,11 +29,11 @@ impl Component for Example {
 
     fn create(ctx: &Context<Self>) -> Self {
         Example {
-            props,
+            props: ctx.props().clone(),
             float: 1.2,
             integer: 30,
             log_level: None,
-            link,
+            link: ctx.link().clone(),
         }
     }
 
@@ -51,6 +51,15 @@ impl Component for Example {
             Msg::Noop => {}
         }
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
@@ -83,7 +92,7 @@ impl Component for Example {
                         onchange={self.link.callback(|x| Msg::FloatUpdate(x))}
                     />
                     <Tag
-                        style={Cow::Borrowed("width: 32px; margin-left: 16px")}
+                        style="width: 32px; margin-left: 16px"
                         minimal=true
                         intent={self.props.intent}
                     >

@@ -1,6 +1,5 @@
 use crate::icon::ICON_SIZE_LARGE;
 use crate::{Icon, IconName, Intent};
-use std::borrow::Cow;
 use yew::prelude::*;
 
 pub struct Callout {
@@ -28,12 +27,21 @@ impl Component for Callout {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
@@ -64,7 +72,7 @@ impl Component for Callout {
                 }
                 {
                     self.props.title.iter()
-                        .map(|title| html!{<h4 class={"bp3-heading"}>{title}</h4>})
+                        .map(|title| html!{<h4 class="bp3-heading">{title}</h4>})
                         .collect::<Html>()
                 }
                 { self.props.children.clone() }

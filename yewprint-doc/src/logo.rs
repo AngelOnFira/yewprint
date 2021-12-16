@@ -15,7 +15,9 @@ impl Component for Logo {
     type Properties = LogoProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        Self { props }
+        Self {
+            props: ctx.props().clone(),
+        }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
@@ -23,8 +25,8 @@ impl Component for Logo {
     }
 
     fn changed(&mut self, ctx: &Context<Self>) -> bool {
-        if props != self.props {
-            self.props = props;
+        if ctx.props().clone() != self.props {
+            self.props = ctx.props().clone();
             true
         } else {
             false

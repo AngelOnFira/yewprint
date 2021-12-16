@@ -1,10 +1,9 @@
 use yew::prelude::*;
 use yewprint::{Button, Collapse, IconName, Intent};
-
 pub struct ExampleContainer {
     collapsed: bool,
     props: ExampleContainerProps,
-    link: &html::Scope<Self>,
+    link: html::Scope<Self>,
 }
 
 pub enum Msg {
@@ -24,10 +23,10 @@ impl Component for ExampleContainer {
     type Properties = ExampleContainerProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        ExampleContainer {
+        Self {
             collapsed: true,
-            props,
-            link,
+            props: ctx.props().clone(),
+            link: ctx.link().clone(),
         }
     }
 
@@ -36,6 +35,17 @@ impl Component for ExampleContainer {
             Msg::ToggleSource => self.collapsed ^= true,
         }
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        self.link = ctx.link().clone();
+
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
@@ -90,10 +100,13 @@ macro_rules! build_example_prop_component {
 
         impl Component for $name {
             type Message = ();
-            type Properties = Self;
+            type Properties = $name;
 
             fn create(ctx: &Context<Self>) -> Self {
-                props: *ctx.props()
+                Self {
+                    props: ctx.props().props.clone(),
+                    callback: ctx.props().callback.clone(),
+                }
             }
 
             fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
@@ -101,9 +114,10 @@ macro_rules! build_example_prop_component {
             }
 
             fn changed(&mut self, ctx: &Context<Self>) -> bool {
-                if self.props != ctx.props().props || self.callback != ctx.props().callback {
-                    self.props = ctx.props().props;
-                    self.callback = ctx.props().callback;
+                let props = ctx.props().props.clone();
+                if self.props != props || self.callback != ctx.props().callback {
+                    self.props = props;
+                    self.callback = ctx.props().callback.clone();
                     true
                 } else {
                     false
@@ -119,7 +133,10 @@ macro_rules! build_example_prop_component {
                 updater: impl Fn($prop_component, T) -> $prop_component + 'static,
             ) -> Callback<T> {
                 let props = self.props.clone();
-                self.callback.clone().reform(move |event| updater(props.clone(), event))
+                self.callback.clone().reform(move |event| updater(
+                    props.clone(),
+                    event
+                ))
             }
         }
     };

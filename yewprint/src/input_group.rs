@@ -64,7 +64,7 @@ pub struct InputGroupProps {
     #[prop_or_default]
     pub round: bool,
     #[prop_or_default]
-    pub placeholder: String,
+    pub placeholder: Option<String>,
     #[prop_or_default]
     pub left_icon: Option<IconName>,
     #[prop_or_default]
@@ -80,7 +80,7 @@ pub struct InputGroupProps {
     #[prop_or_default]
     pub onkeydown: Callback<KeyboardEvent>,
     #[prop_or_default]
-    pub value: String,
+    pub value: Option<String>,
     #[prop_or_default]
     pub class: Classes,
     #[prop_or_default]
@@ -93,8 +93,8 @@ impl Component for InputGroup {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
-            link: *ctx.link(),
+            props: ctx.props().clone(),
+            link: ctx.link().clone(),
             left_element_ref: Default::default(),
             left_element_width: Default::default(),
             right_element_ref: Default::default(),
@@ -102,8 +102,17 @@ impl Component for InputGroup {
         }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, _: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {

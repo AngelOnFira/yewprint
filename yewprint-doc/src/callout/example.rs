@@ -19,7 +19,7 @@ impl Component for Example {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
         }
     }
 
@@ -27,10 +27,19 @@ impl Component for Example {
         true
     }
 
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
+    }
+
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
             <Callout
-                title={self.props.show_title.then(|| Cow::Borrowed("Visually important content"))}
+                title={self.props.show_title.then(|| "Visually important content")}
                 without_icon={!self.props.show_icon}
                 intent={self.props.intent}
             >

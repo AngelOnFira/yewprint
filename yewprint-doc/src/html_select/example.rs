@@ -3,7 +3,7 @@ use yewprint::{HtmlSelect, Text};
 
 pub struct Example {
     props: ExampleProps,
-    link: &html::Scope<Self>,
+    link: html::Scope<Self>,
     log_level: LogLevel,
 }
 
@@ -21,8 +21,8 @@ impl Component for Example {
 
     fn create(ctx: &Context<Self>) -> Self {
         Example {
-            props,
-            link,
+            props: ctx.props().clone(),
+            link: ctx.link().clone(),
             log_level: LogLevel::Info,
         }
     }
@@ -30,6 +30,15 @@ impl Component for Example {
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         self.log_level = msg;
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {

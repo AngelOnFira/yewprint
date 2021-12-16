@@ -2,7 +2,7 @@ use yew::prelude::*;
 use yewprint::Button;
 
 pub struct Example {
-    link: &html::Scope<Self>,
+    link: html::Scope<Self>,
     counter: i64,
     props: ExampleProps,
 }
@@ -28,10 +28,10 @@ impl Component for Example {
     type Properties = ExampleProps;
 
     fn create(ctx: &Context<Self>) -> Self {
-        Example {
+        Self {
             counter: 0,
-            link,
-            props,
+            link: ctx.link().clone(),
+            props: ctx.props().clone(),
         }
     }
 
@@ -40,6 +40,15 @@ impl Component for Example {
             Msg::AddOne => self.counter += 1,
         }
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {

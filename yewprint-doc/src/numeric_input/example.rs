@@ -1,10 +1,9 @@
-use std::borrow::Cow;
 use yew::prelude::*;
 use yewprint::{Button, Callout, IconName, Intent, NumericInput};
 
 pub struct Example {
     props: ExampleProps,
-    link: &html::Scope<Self>,
+    link: html::Scope<Self>,
     value: i32,
     value_two: i32,
 }
@@ -31,8 +30,8 @@ impl Component for Example {
 
     fn create(ctx: &Context<Self>) -> Self {
         Example {
-            props,
-            link,
+            props: ctx.props().clone(),
+            link: ctx.link().clone(),
             value: 0,
             value_two: 0,
         }
@@ -54,12 +53,22 @@ impl Component for Example {
         true
     }
 
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
+    }
+
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
             <>
             <NumericInput<i32>
                 disabled={self.props.disabled}
-                fill={self.props.large}
+                fill={self.props.fill}
+                large={self.props.large}
                 value={self.value}
                 bounds={-105..}
                 increment=10
@@ -89,7 +98,7 @@ impl Component for Example {
                 {"Reset at 4"}
             </Button>
             <Callout
-                title={Cow::Borrowed("Selected values")}
+                title={"Selected values"}
                 intent={Intent::Primary}
             >
                 <ul>

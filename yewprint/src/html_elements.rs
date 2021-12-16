@@ -2,9 +2,9 @@ use yew::prelude::*;
 
 macro_rules! build_component {
     ($name:ident, $props_name:ident, $tag:tt, $class:literal) => {
-        pub struct $name;
+        pub type $name = $props_name;
 
-        #[derive(Debug, Clone, PartialEq, yew::prelude::Properties)]
+        #[derive(Debug, Clone, PartialEq, Properties)]
         pub struct $props_name {
             #[prop_or_default]
             pub class: Classes,
@@ -18,12 +18,12 @@ macro_rules! build_component {
 
             fn create(ctx: &Context<Self>) -> Self {
                 Self {
-                    class: Classes::new(),
                     children: ctx.props().children.clone(),
+                    class: ctx.props().class.clone(),
                 }
             }
 
-            fn view(&self, _ctx: &yew::Context<Self>) -> Html {
+            fn view(&self, ctx: &yew::Context<Self>) -> Html {
                 html! {
                     <$tag class={classes!($class, ctx.props().class.clone())}>
                         {self.children.clone()}

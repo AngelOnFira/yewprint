@@ -48,7 +48,7 @@ impl<T: Clone + PartialEq + Hash + 'static> Component for Tabs<T> {
             .collect::<HashMap<_, _>>();
 
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
             tab_refs,
             indicator_ref: Default::default(),
         }
@@ -56,6 +56,15 @@ impl<T: Clone + PartialEq + Hash + 'static> Component for Tabs<T> {
 
     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {

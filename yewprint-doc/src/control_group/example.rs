@@ -3,6 +3,8 @@ use yewprint::{Button, ControlGroup, HtmlSelect, IconName, InputGroup};
 
 pub struct Example {
     props: ExampleProps,
+    link: html::Scope<Self>,
+    selected: Option<Sorting>,
 }
 
 #[derive(Clone, PartialEq, Properties)]
@@ -11,18 +13,36 @@ pub struct ExampleProps {
     pub vertical: bool,
 }
 
+pub enum Msg {
+    Select(Option<Sorting>),
+}
+
 impl Component for Example {
-    type Message = ();
+    type Message = Msg;
     type Properties = ExampleProps;
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
+            link: ctx.link().clone(),
+            selected: None,
         }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            Msg::Select(v) => self.selected = v,
+        }
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
@@ -39,8 +59,13 @@ impl Component for Example {
                         (Some(Sorting::PriceAscending), "Price - ascending".to_string()),
                         (Some(Sorting::PriceDescending), "Price - descending".to_string()),
                     ]}
+                    value={self.selected}
+                    onchange={self.link.callback(|x| Msg::Select(x))}
                 />
-                <InputGroup placeholder="Find filters..." />
+                // TODO: onchange
+                <InputGroup
+                    placeholder="Find filters..."
+                />
                 <Button icon={IconName::ArrowRight} />
             </ControlGroup>
         }

@@ -28,12 +28,21 @@ impl Component for Switch {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
         true
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
@@ -48,17 +57,17 @@ impl Component for Switch {
                     self.props.class.clone(),
                 )}
             >
-            <input
-                type="checkbox"
-                checked={self.props.checked}
-                onclick={self.props.onclick.clone()}
-                disabled={self.props.disabled}
-            />
-            <span
-                class={classes!("bp3-control-indicator")}
-            >
-            </span>
-            {self.props.label.clone()}
+                <input
+                    type="checkbox"
+                    checked={self.props.checked}
+                    onclick={self.props.onclick.clone()}
+                    disabled={self.props.disabled}
+                />
+                <span
+                    class={classes!("bp3-control-indicator")}
+                >
+                </span>
+                {self.props.label.clone()}
             </label>
         }
     }

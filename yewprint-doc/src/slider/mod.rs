@@ -126,6 +126,7 @@ crate::build_example_prop_component! {
                         (Some(Intent::Warning), "Warning".to_string()),
                         (Some(Intent::Danger), "Danger".to_string()),
                     ]}
+                    value={self.props.intent}
                     onchange={self.update_props(|props, intent| ExampleProps {
                         intent,
                         ..props

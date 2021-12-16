@@ -11,7 +11,7 @@ impl Component for CollapseDoc {
     type Message = ();
     type Properties = ();
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         CollapseDoc
     }
 

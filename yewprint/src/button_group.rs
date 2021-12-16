@@ -28,7 +28,7 @@ impl Component for ButtonGroup {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: *ctx.props(),
+            props: ctx.props().clone(),
         }
     }
 
@@ -36,7 +36,16 @@ impl Component for ButtonGroup {
         true
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
+    fn changed(&mut self, ctx: &Context<Self>) -> bool {
+        if self.props != *ctx.props() {
+            self.props = ctx.props().clone();
+            true
+        } else {
+            false
+        }
+    }
+
+    fn view(&self, _: &Context<Self>) -> Html {
         html! {
             <div
                 class={classes!(
