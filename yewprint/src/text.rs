@@ -16,9 +16,9 @@ pub struct TextProps {
     #[prop_or_default]
     pub inline: bool,
     #[prop_or_default]
-    pub title: String,
+    pub title: Option<String>,
     #[prop_or_default]
-    pub style: String,
+    pub style: Option<String>,
 }
 
 impl Component for Text {

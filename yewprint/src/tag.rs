@@ -35,11 +35,11 @@ pub struct TagProps {
     #[prop_or_default]
     pub round: bool,
     #[prop_or_default]
-    pub title: String,
+    pub title: Option<String>,
     #[prop_or_default]
     pub class: Classes,
     #[prop_or_default]
-    pub style: String,
+    pub style: Option<String>,
 }
 
 impl Component for Tag {

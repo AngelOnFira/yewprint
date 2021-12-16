@@ -64,7 +64,7 @@ pub struct InputGroupProps {
     #[prop_or_default]
     pub round: bool,
     #[prop_or_default]
-    pub placeholder: String,
+    pub placeholder: Option<String>,
     #[prop_or_default]
     pub left_icon: Option<IconName>,
     #[prop_or_default]
@@ -80,7 +80,7 @@ pub struct InputGroupProps {
     #[prop_or_default]
     pub onkeydown: Callback<KeyboardEvent>,
     #[prop_or_default]
-    pub value: String,
+    pub value: Option<String>,
     #[prop_or_default]
     pub class: Classes,
     #[prop_or_default]

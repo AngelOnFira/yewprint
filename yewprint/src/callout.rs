@@ -1,6 +1,5 @@
 use crate::icon::ICON_SIZE_LARGE;
 use crate::{Icon, IconName, Intent};
-use std::borrow::Cow;
 use yew::prelude::*;
 
 pub struct Callout {
@@ -18,7 +17,7 @@ pub struct CalloutProps {
     #[prop_or_default]
     pub intent: Option<Intent>,
     #[prop_or_default]
-    pub title: Option<Cow<'static, str>>,
+    pub title: Option<String>,
     pub children: html::Children,
 }
 

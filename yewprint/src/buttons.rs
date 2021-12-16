@@ -28,13 +28,13 @@ pub struct ButtonProps {
     #[prop_or_default]
     pub intent: Option<Intent>,
     #[prop_or_default]
-    pub title: String,
+    pub title: Option<String>,
     #[prop_or_default]
     pub onclick: Callback<MouseEvent>,
     #[prop_or_default]
     pub class: Classes,
     #[prop_or_default]
-    pub style: String,
+    pub style: Option<String>,
     #[prop_or_default]
     pub children: html::Children,
 }

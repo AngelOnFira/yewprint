@@ -49,7 +49,7 @@ impl Component for Example {
         }
     }
 
-    fn update(&mut self, _ctx:  &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             ExampleMessage::OpenPanel2 => self
                 .state
@@ -120,7 +120,7 @@ impl Component for Panel2 {
         }
     }
 
-    fn update(&mut self, _ctx:  &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Panel2Message::AddOne => {
                 self.counter += 1;

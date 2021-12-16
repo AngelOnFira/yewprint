@@ -1,4 +1,5 @@
 use gloo_timers::callback::Timeout;
+use std::{convert::TryInto, time::Duration};
 use web_sys::Element;
 use yew::prelude::*;
 
@@ -23,8 +24,8 @@ pub struct CollapseProps {
     pub children: html::Children,
     #[prop_or_default]
     pub keep_children_mounted: bool,
-    #[prop_or(200)]
-    pub transition_duration: u32,
+    #[prop_or(Duration::from_millis(200))]
+    pub transition_duration: Duration,
     #[prop_or_default]
     pub class: Classes,
 }
@@ -102,14 +103,20 @@ impl Component for Collapse {
         }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, _msg: Self::Message) -> bool {
         let link = self.link.clone();
+
         match self.animation_state {
             AnimationState::OpenStart => {
+                let link = ctx.link().clone();
                 self.animation_state = AnimationState::Opening;
                 self.height = Height::Full;
                 self.handle_delayed_state_change = Some(Timeout::new(
-                    self.props.transition_duration,
+                    self.props
+                        .transition_duration
+                        .as_millis()
+                        .try_into()
+                        .unwrap(),
                     move || {
                         drop(link.send_message(()));
                     },
@@ -117,10 +124,15 @@ impl Component for Collapse {
                 true
             }
             AnimationState::ClosingStart => {
+                let link = ctx.link().clone();
                 self.animation_state = AnimationState::Closing;
                 self.height = Height::Zero;
                 self.handle_delayed_state_change = Some(Timeout::new(
-                    self.props.transition_duration,
+                    self.props
+                        .transition_duration
+                        .as_millis()
+                        .try_into()
+                        .unwrap(),
                     move || {
                         drop(link.send_message(()));
                     },

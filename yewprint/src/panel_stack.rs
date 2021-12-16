@@ -225,13 +225,11 @@ impl Component for PanelStack {
     fn rendered(&mut self, ctx: &Context<Self>, _first_render: bool) {
         if self.props.state.action.clone() == Some(StateAction::Pop) {
             let link = ctx.link().clone();
-            let callback = move || {
-                link.callback(|_: String| PanelStackMessage::PopPanel);
-            };
-            self.timeout_task.replace(Timeout::new(
-                400,
-                callback,
-            ));
+
+            self.timeout_task.replace(Timeout::new(400, move || {
+                // link.send_message(PanelStackMessage::PopPanel)
+                link.callback(|_: Option<String>| PanelStackMessage::PopPanel);
+            }));
         }
     }
 }

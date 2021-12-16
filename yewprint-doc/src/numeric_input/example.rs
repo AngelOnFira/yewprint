@@ -1,4 +1,3 @@
-use std::borrow::Cow;
 use yew::prelude::*;
 use yewprint::{Button, Callout, IconName, Intent, NumericInput};
 
@@ -38,7 +37,7 @@ impl Component for Example {
         }
     }
 
-    fn update(&mut self, _ctx:  &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Reset => {
                 self.value = 4;
@@ -99,7 +98,7 @@ impl Component for Example {
                 {"Reset at 4"}
             </Button>
             <Callout
-                title={Cow::Borrowed("Selected values")}
+                title={"Selected values"}
                 intent={Intent::Primary}
             >
                 <ul>

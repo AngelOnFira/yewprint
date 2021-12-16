@@ -13,19 +13,19 @@ macro_rules! build_component {
         }
 
         impl Component for $props_name {
-            type Message = Self;
-            type Properties = Self;
+            type Message = ();
+            type Properties = $props_name;
 
-            fn create(_ctx: &Context<Self>) -> Self {
+            fn create(ctx: &Context<Self>) -> Self {
                 Self {
-                    children: _ctx.props().children.clone(),
-                    class: _ctx.props().class.clone(),
+                    children: ctx.props().children.clone(),
+                    class: ctx.props().class.clone(),
                 }
             }
 
-            fn view(&self, _ctx: &yew::Context<Self>) -> Html {
+            fn view(&self, ctx: &yew::Context<Self>) -> Html {
                 html! {
-                    <$tag class={classes!($class, self.class.clone())}>
+                    <$tag class={classes!($class, ctx.props().class.clone())}>
                         {self.children.clone()}
                     </$tag>
                 }
